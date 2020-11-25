@@ -19,10 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="">
+    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="Change code structure">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/log.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/kafka.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/kafka.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,6 +103,10 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Change code structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="Change code structure" />
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
@@ -110,21 +115,25 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="752" y="358" key="#Go_Modules/0.0.1920.1050@0.0.1920.1050" timestamp="1605859365801" />
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606202988219">
+    <state x="721" y="327" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1606291703243">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606202988219" />
-    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606202988219">
+    <state x="721" y="327" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1606291703243" />
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606271269243">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606202988219" />
-    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606202988219">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606271269243" />
+    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606271269243">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606202988219" />
-    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606202988219">
+    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606271269243" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606271269243">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606202988219" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606271269243" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606271269243">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606271269243" />
   </component>
 </project>

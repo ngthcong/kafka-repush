@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"gopkg.in/robfig/cron.v2"
 	"kafka-repush/services"
 	"log"
 	"os"
@@ -18,12 +19,12 @@ type (
 		lastLineFileName string
 		failPushFileName string
 		cronFormat       string
-		broker			[]string
+		broker           []string
 	}
 )
 
 var (
-//brokers = []string{"192.168.75.132:9092"}
+	//brokers = []string{"192.168.75.132:9092"}
 	config serviceConfig
 )
 
@@ -49,7 +50,9 @@ func main() {
 	switch os.Args[1] {
 	case "default":
 
-		defaultCmd.Parse(os.Args[2:])
+		if err := defaultCmd.Parse(os.Args[2:]); err != nil {
+			log.Fatalln(err)
+		}
 		fmt.Println("Service run with default config")
 		fmt.Println("  Log file's name:", *defLogName)
 		fmt.Println("  Last line file's name:", *defLastLineName)
@@ -61,12 +64,14 @@ func main() {
 			logFileName:      *defLogName,
 			lastLineFileName: *defLastLineName,
 			failPushFileName: *defFailName,
-			broker: strings.Split(*defBroker," "),
+			broker:           strings.Split(*defBroker, " "),
 		}
 
 	case "schedule":
+		if err := scheduleCmd.Parse(os.Args[2:]); err != nil {
+			log.Fatalln(err)
+		}
 
-		scheduleCmd.Parse(os.Args[2:])
 		fmt.Println("Service run with schedule config")
 		fmt.Println("  Log file's name:", *slogName)
 		fmt.Println("  Last line file's name:", *sLastLineName)
@@ -79,7 +84,7 @@ func main() {
 			logFileName:      *slogName,
 			lastLineFileName: *sLastLineName,
 			failPushFileName: *sFailName,
-			broker: strings.Split(*sBroker," "),
+			broker:           strings.Split(*sBroker, " "),
 			cronFormat:       *cronFormat,
 		}
 
@@ -93,40 +98,82 @@ func main() {
 }
 func startService(config serviceConfig) {
 
-	fmt.Println("---------------Starting service---------------")
+	fmt.Println("---------------Service Running---------------")
 
-	producer,err := services.NewProducer(config.broker)
-	if err != nil{
+	producer, err := services.NewProducer(config.broker)
+	if err != nil {
 		log.Fatal(err)
 	}
-
 	serviceConfig := services.ServiceConfig{
-		FileConfig:   services.FileConfig{
+		FileConfig: services.FileConfig{
 			LogName:      config.logFileName,
-			LastLineName:   config.lastLineFileName,
+			LastLineName: config.lastLineFileName,
 			FailPushName: config.failPushFileName,
 		},
 		KafkaProducer: producer,
 	}
-
 	service := services.NewLogHandler(serviceConfig)
 
 	// Run with default setting and only run one time
 	if config.isDefault {
-		service.ReadLog()
+		logHandlerService(service)
+		if err = service.Close(); err != nil {
+			log.Fatalln(err)
+		}
 		return
 	}
 
 	// Run with schedule setting and run with cron config
-	service.Start(config.cronFormat)
+	cronService := cron.New()
+	_, err = cronService.AddFunc(config.cronFormat, func() {
+		logHandlerService(service)
+
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	cronService.Start()
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGTERM, syscall.SIGINT, os.Interrupt, os.Kill)
 	for {
 		select {
 		case <-exit:
-			service.Close()
 			fmt.Println("Exiting...")
+			cronService.Stop()
+			if err = service.Close(); err != nil {
+				log.Fatalln(err)
+			}
+
 			return
 		}
+	}
+}
+
+func logHandlerService(service services.LogHandler) {
+	lastLine, err := service.GetLastLine()
+	if err != nil {
+		log.Println("Get last line failed, err: ", err)
+	}
+
+	if err := service.GetLog(); err != nil {
+		log.Fatalln("Get log failed, err: ", err)
+	}
+
+	if err := service.GetFailFile(); err != nil {
+		log.Fatalln("Get fail log failed, err: ", err)
+	}
+
+	newLastLine, err := service.ReadLog(lastLine)
+	if err != nil {
+		log.Fatalln("Read log Failed, err: ", err)
+	}
+
+	if err = service.StoreLastLine(newLastLine); err != nil {
+		log.Fatalln("Store last line failed, err: ", err)
+	}
+
+	if err = service.CloseFile(); err != nil {
+		log.Fatalln("Close file failed, err: ", err)
 	}
 }

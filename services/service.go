@@ -5,14 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Shopify/sarama"
-	"gopkg.in/robfig/cron.v2"
 	"log"
 	"os"
-	"time"
 )
 
 type (
-	StringProducerMessage string
+	Message string
 
 	LogInfo struct {
 		Topic   string `json:"topic"`
@@ -20,21 +18,28 @@ type (
 	}
 
 	LogHandler interface {
-		Start(cronFormat string)
-		ReadLog()
-		Close()
-		Producer
+		GetLastLine() (int64, error)
+		GetLog() error
+		GetFailFile() error
+		ReadLog(lastLine int64) (int64, error)
+		Send(topic string, msg ProducerMessage) error
+		StoreLastLine(lineNum int64) error
+		WriteFailPush(msg string) error
+		CloseFile() error
+		Close() error
 	}
 
-	logHandler struct{}
+	logHandler struct {
+		ServiceConfig
+	}
 
 	FileConfig struct {
 		LogName      string
 		LastLineName string
 		FailPushName string
 	}
-	offsetInfo struct {
-		Offset int64 `json:"offset"`
+	LastLineInfo struct {
+		LastLine int64 `json:"lastLine"`
 	}
 	ServiceConfig struct {
 		FileConfig    FileConfig
@@ -43,151 +48,135 @@ type (
 )
 
 var (
-	cronService   *cron.Cron
-	serviceConfig ServiceConfig
+	logFile, failFile *os.File
 )
 
 // Key ..
 func (r LogInfo) Key() string {
-	return r.Topic
+	return r.Message
 }
 
 func NewLogHandler(config ServiceConfig) LogHandler {
-	serviceConfig = config
-	return &logHandler{}
+	return &logHandler{config}
 }
 
-func (handler *logHandler) ReadLog() {
-	fmt.Println("Start reading logfile at " + time.Now().String())
-
-	lastLine, err := getLastLine()
+func (handler *logHandler) GetLog() error {
+	file, err := os.OpenFile(handler.FileConfig.LogName, os.O_RDONLY, 0444)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
-
-	logFile, err := os.Open(serviceConfig.FileConfig.LogName)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	scanner := bufio.NewScanner(logFile)
-
-	var newLastLine int64
-
-	for scanner.Scan() {
-		newLastLine++
-		if newLastLine > lastLine {
-			var logInfo LogInfo
-			err := json.Unmarshal(scanner.Bytes(), &logInfo)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			err = handler.Send(logInfo.Topic, logInfo)
-			if err != nil {
-				fmt.Println("Fail sending message to kafka server")
-				err = writeFailPush(scanner.Text())
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("Send success Topic: %s || Message: %s \n", logInfo.Topic, logInfo)
-		}
-	}
-
-	if scanner.Err() != nil {
-		log.Fatalln(scanner.Err())
-	}
-
-	err = storeOffset(newLastLine)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return
+	logFile = file
+	return nil
 }
 
-func getLastLine() (int64, error) {
-	if !isExist(serviceConfig.FileConfig.LastLineName){
-		return  0,nil
+func (handler *logHandler) GetLastLine() (int64, error) {
+	if !isExist(handler.FileConfig.LastLineName) {
+		return 0, nil
 	}
-	offsetFile, err := os.Open(serviceConfig.FileConfig.LastLineName)
+	lastLineFile, err := os.OpenFile(handler.FileConfig.LastLineName, os.O_RDONLY, 0644)
 	if err != nil {
 		return 0, err
 	}
 
-	scanner := bufio.NewScanner(offsetFile)
+	lastLineScanner := bufio.NewScanner(lastLineFile)
 
-	offsetJson := offsetInfo{}
-	for scanner.Scan() {
-		err = json.Unmarshal(scanner.Bytes(), &offsetJson)
+	lastLineJson := LastLineInfo{}
+
+	for lastLineScanner.Scan() {
+		err = json.Unmarshal(lastLineScanner.Bytes(), &lastLineJson)
 		if err != nil {
 			return 0, err
 		}
 	}
-	if scanner.Err() != nil {
-		return 0, scanner.Err()
+	if err = lastLineFile.Close(); err != nil {
+		return 0, err
 	}
-
-	return offsetJson.Offset, nil
+	return lastLineJson.LastLine, nil
 }
 
-func storeOffset(lineNum int64) error {
-	f, err := os.Create(serviceConfig.FileConfig.LastLineName)
+func (handler *logHandler) GetFailFile() error {
+	file, err := os.OpenFile(handler.FileConfig.FailPushName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
+	failFile = file
+	return nil
+}
 
-	offset, err := json.Marshal(offsetInfo{Offset: lineNum})
+func (handler *logHandler) ReadLog(lastLine int64) (int64, error) {
+	log.Println("Start reading log at: ", lastLine)
+	scanner := bufio.NewScanner(logFile)
+	var newLastLine int64
+	for scanner.Scan() {
+		newLastLine++
+		if newLastLine > lastLine {
+			var logInfo LogInfo
+			if err := json.Unmarshal(scanner.Bytes(), &logInfo); err != nil {
+				log.Println(err)
+
+				if err := handler.WriteFailPush(scanner.Text()); err != nil {
+					log.Println("Write push failed, err: ", err)
+				}
+				continue
+			}
+			if err := handler.Send(logInfo.Topic, logInfo); err != nil {
+				log.Println("Fail sending message to kafka server")
+				if err := handler.WriteFailPush(scanner.Text()); err != nil {
+					log.Println("Write push failed, err: ", err)
+				}
+			}
+		}
+	}
+	return newLastLine, nil
+}
+
+func (handler *logHandler) StoreLastLine(lineNum int64) error {
+	file, err := os.OpenFile(handler.FileConfig.LastLineName, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
-
-	_, err = f.Write(offset)
+	lastLine, err := json.Marshal(LastLineInfo{LastLine: lineNum})
 	if err != nil {
 		return err
 	}
-
-	err = f.Close()
-	if err != nil {
+	if err = file.Truncate(0); err != nil {
+		return err
+	}
+	if _, err = file.Write(lastLine); err != nil {
+		return err
+	}
+	if err = file.Close(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func writeFailPush(msg string) error {
-	f, err := os.OpenFile(serviceConfig.FileConfig.FailPushName+"_"+time.Now().Format("01-02-2006")+".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	if _, err := f.Write([]byte(msg + "\n")); err != nil {
-		return err
-	}
-	if err := f.Close(); err != nil {
+func (handler *logHandler) WriteFailPush(msg string) error {
+	if _, err := failFile.Write([]byte(msg + "\n")); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (handler *logHandler) Start(cronFormat string) {
-	cronService = cron.New()
-	_, err := cronService.AddFunc(cronFormat, handler.ReadLog)
-	if err != nil {
-		log.Fatalln(err)
+func (handler *logHandler) CloseFile() error {
+	//Closing files
+	if err := logFile.Close(); err != nil {
+		return err
 	}
-	cronService.Start()
+	if err := failFile.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (*logHandler) Close() {
-	//Closing cron and kafka
-	cronService.Stop()
-	err := serviceConfig.KafkaProducer.Close()
-	if err != nil {
-		log.Fatalln(err)
-	}
+func (handler *logHandler) Close() error {
+	//Closing  kafka
+	return handler.KafkaProducer.Close()
 }
 
-func (*logHandler) Send(topic string, msg ProducerMessage) error {
+func (handler *logHandler) Send(topic string, msg ProducerMessage) error {
 	//Sending to kafka server
-	jsonMsg, err := json.Marshal(msg)
+	jsonMsg, err := json.Marshal(msg.Key())
 	if err != nil {
 		return err
 	}
@@ -196,7 +185,12 @@ func (*logHandler) Send(topic string, msg ProducerMessage) error {
 		Partition: -1,
 		Value:     sarama.StringEncoder(jsonMsg),
 	}
-	_, _, err = serviceConfig.KafkaProducer.SendMessage(kafkaMsg)
+	_, _, err = handler.KafkaProducer.SendMessage(kafkaMsg)
+
+	if err == nil {
+		fmt.Printf("Send success Topic: %s || Message: %s \n", topic, msg.Key())
+	}
+
 	return err
 }
 
