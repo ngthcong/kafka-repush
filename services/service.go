@@ -3,8 +3,6 @@ package services
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
-	"github.com/Shopify/sarama"
 	"log"
 	"os"
 )
@@ -15,20 +13,20 @@ type (
 		Message string `json:"message"`
 	}
 
-	LogHandler interface {
+	LogService interface {
 		GetLastLine() (int64, error)
 		GetLog() error
 		GetFailFile() error
 		ReadLog(lastLine int64) (int64, error)
-		Send(topic string, msg ProducerMessage) error
 		StoreLastLine(lineNum int64) error
 		WriteFailPush(msg string) error
 		CloseFile() error
 		Close() error
 	}
 
-	logHandler struct {
-		ServiceConfig
+	LogHandler struct {
+		config FileConfig
+		prod   KafkaProducer
 	}
 
 	FileConfig struct {
@@ -36,12 +34,9 @@ type (
 		LastLineName string
 		FailPushName string
 	}
+
 	LastLineInfo struct {
 		LastLine int64 `json:"lastLine"`
-	}
-	ServiceConfig struct {
-		FileConfig    FileConfig
-		KafkaProducer sarama.SyncProducer
 	}
 )
 
@@ -54,12 +49,12 @@ func (r LogInfo) Key() string {
 	return r.Message
 }
 
-func NewLogHandler(config ServiceConfig) LogHandler {
-	return &logHandler{config}
+func NewLogHandler(producer KafkaProducer, config FileConfig) *LogHandler {
+	return &LogHandler{prod: producer, config: config}
 }
 
-func (handler *logHandler) GetLog() error {
-	file, err := os.OpenFile(handler.FileConfig.LogName, os.O_RDONLY, 0444)
+func (h *LogHandler) GetLog() error {
+	file, err := os.OpenFile(h.config.LogName, os.O_RDONLY, 0444)
 	if err != nil {
 		return err
 	}
@@ -67,11 +62,11 @@ func (handler *logHandler) GetLog() error {
 	return nil
 }
 
-func (handler *logHandler) GetLastLine() (int64, error) {
-	if !isExist(handler.FileConfig.LastLineName) {
+func (h *LogHandler) GetLastLine() (int64, error) {
+	if !isExist(h.config.LastLineName) {
 		return 0, nil
 	}
-	lastLineFile, err := os.OpenFile(handler.FileConfig.LastLineName, os.O_RDONLY, 0644)
+	lastLineFile, err := os.OpenFile(h.config.LastLineName, os.O_RDONLY, 0644)
 	if err != nil {
 		return 0, err
 	}
@@ -91,8 +86,8 @@ func (handler *logHandler) GetLastLine() (int64, error) {
 	return lastLineJson.LastLine, lastLineFile.Close()
 }
 
-func (handler *logHandler) GetFailFile() error {
-	file, err := os.OpenFile(handler.FileConfig.FailPushName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func (h *LogHandler) GetFailFile() error {
+	file, err := os.OpenFile(h.config.FailPushName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -100,7 +95,7 @@ func (handler *logHandler) GetFailFile() error {
 	return nil
 }
 
-func (handler *logHandler) ReadLog(lastLine int64) (int64, error) {
+func (h *LogHandler) ReadLog(lastLine int64) (int64, error) {
 	log.Println("Start reading log at: ", lastLine)
 	scanner := bufio.NewScanner(logFile)
 	var newLastLine int64
@@ -111,14 +106,14 @@ func (handler *logHandler) ReadLog(lastLine int64) (int64, error) {
 			if err := json.Unmarshal(scanner.Bytes(), &logInfo); err != nil {
 				log.Println(err)
 
-				if err := handler.WriteFailPush(scanner.Text()); err != nil {
+				if err := h.WriteFailPush(scanner.Text()); err != nil {
 					log.Println("Write push failed, err: ", err)
 				}
 				continue
 			}
-			if err := handler.Send(logInfo.Topic, logInfo); err != nil {
+			if err := h.prod.Send(logInfo.Topic, logInfo); err != nil {
 				log.Println("Fail sending message to kafka server")
-				if err := handler.WriteFailPush(scanner.Text()); err != nil {
+				if err := h.WriteFailPush(scanner.Text()); err != nil {
 					log.Println("Write push failed, err: ", err)
 				}
 			}
@@ -127,8 +122,8 @@ func (handler *logHandler) ReadLog(lastLine int64) (int64, error) {
 	return newLastLine, nil
 }
 
-func (handler *logHandler) StoreLastLine(lineNum int64) error {
-	file, err := os.OpenFile(handler.FileConfig.LastLineName, os.O_CREATE|os.O_WRONLY, 0644)
+func (h *LogHandler) StoreLastLine(lineNum int64) error {
+	file, err := os.OpenFile(h.config.LastLineName, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -151,14 +146,14 @@ func (handler *logHandler) StoreLastLine(lineNum int64) error {
 	return nil
 }
 
-func (handler *logHandler) WriteFailPush(msg string) error {
+func (h *LogHandler) WriteFailPush(msg string) error {
 	if _, err := failFile.Write([]byte(msg + "\n")); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (handler *logHandler) CloseFile() error {
+func (h *LogHandler) CloseFile() error {
 	//Closing files
 	defer logFile.Close()
 	defer failFile.Close()
@@ -171,30 +166,30 @@ func (handler *logHandler) CloseFile() error {
 	return nil
 }
 
-func (handler *logHandler) Close() error {
+func (h *LogHandler) Close() error {
 	//Closing  kafka
-	return handler.KafkaProducer.Close()
+	return h.prod.Close()
 }
 
-func (handler *logHandler) Send(topic string, msg ProducerMessage) error {
-	//Sending to kafka server
-	jsonMsg, err := json.Marshal(msg.Key())
-	if err != nil {
-		return err
-	}
-	kafkaMsg := &sarama.ProducerMessage{
-		Topic:     topic,
-		Partition: -1,
-		Value:     sarama.StringEncoder(jsonMsg),
-	}
-	_, _, err = handler.KafkaProducer.SendMessage(kafkaMsg)
-
-	if err == nil {
-		fmt.Printf("Send success Topic: %s || Message: %s \n", topic, msg.Key())
-	}
-
-	return err
-}
+//func (h *LogHandler) Send(topic string, msg ProducerMessage) error {
+//	//Sending to kafka server
+//	jsonMsg, err := json.Marshal(msg.Key())
+//	if err != nil {
+//		return err
+//	}
+//	kafkaMsg := &sarama.ProducerMessage{
+//		Topic:     topic,
+//		Partition: -1,
+//		Value:     sarama.StringEncoder(jsonMsg),
+//	}
+//	_, _, err = h.KafkaProducer.SendMessage(kafkaMsg)
+//
+//	if err == nil {
+//		fmt.Printf("Send success Topic: %s || Message: %s \n", topic, msg.Key())
+//	}
+//
+//	return err
+//}
 
 func isExist(fileDir string) bool {
 	if _, err := os.Stat(fileDir); os.IsNotExist(err) {

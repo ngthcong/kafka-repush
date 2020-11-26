@@ -106,15 +106,14 @@ func startService(config serviceConfig) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	serviceConfig := services.ServiceConfig{
-		FileConfig: services.FileConfig{
-			LogName:      config.logFileName,
-			LastLineName: config.lastLineFileName,
-			FailPushName: config.failPushFileName,
-		},
-		KafkaProducer: producer,
+
+	fileConfig := services.FileConfig{
+		LogName:      config.logFileName,
+		LastLineName: config.lastLineFileName,
+		FailPushName: config.failPushFileName,
 	}
-	service := services.NewLogHandler(serviceConfig)
+
+	service := services.NewLogHandler(*producer, fileConfig)
 
 	// Run with default setting and only run one time
 	if config.isDefault {
@@ -159,7 +158,7 @@ func startService(config serviceConfig) {
 	}
 }
 
-func logHandlerService(service services.LogHandler) {
+func logHandlerService(service *services.LogHandler) {
 	lastLine, err := service.GetLastLine()
 	if err != nil {
 		log.Println("Get last line failed, err: ", err)

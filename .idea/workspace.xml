@@ -19,12 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="Change code structure">
+    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="Added defer on closing file">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/log.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/kafka.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/kafka.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service_test.go" afterDir="false" />
     </list>
@@ -53,12 +53,13 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../gotest" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../testing-mongodb-with-gomock" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -107,7 +108,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Change code structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="Change code structure" />
+    <MESSAGE value="Added defer on closing file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added defer on closing file" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -121,10 +123,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="721" y="327" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1606291703243" />
-    <state x="740" y="280" key="FileChooserDialogImpl" timestamp="1606357294210">
+    <state x="740" y="280" key="FileChooserDialogImpl" timestamp="1606384244937">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1606357294210" />
+    <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1606384244937" />
     <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606271269243">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -141,9 +143,9 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606271269243" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606303931836">
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606365984252">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606303931836" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606365984252" />
   </component>
 </project>
