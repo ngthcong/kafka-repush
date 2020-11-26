@@ -10,8 +10,6 @@ import (
 )
 
 type (
-	Message string
-
 	LogInfo struct {
 		Topic   string `json:"topic"`
 		Message string `json:"message"`
@@ -88,10 +86,9 @@ func (handler *logHandler) GetLastLine() (int64, error) {
 			return 0, err
 		}
 	}
-	if err = lastLineFile.Close(); err != nil {
-		return 0, err
-	}
-	return lastLineJson.LastLine, nil
+	defer lastLineFile.Close()
+
+	return lastLineJson.LastLine, lastLineFile.Close()
 }
 
 func (handler *logHandler) GetFailFile() error {
@@ -135,6 +132,8 @@ func (handler *logHandler) StoreLastLine(lineNum int64) error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
+
 	lastLine, err := json.Marshal(LastLineInfo{LastLine: lineNum})
 	if err != nil {
 		return err
@@ -148,6 +147,7 @@ func (handler *logHandler) StoreLastLine(lineNum int64) error {
 	if err = file.Close(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -160,6 +160,8 @@ func (handler *logHandler) WriteFailPush(msg string) error {
 
 func (handler *logHandler) CloseFile() error {
 	//Closing files
+	defer logFile.Close()
+	defer failFile.Close()
 	if err := logFile.Close(); err != nil {
 		return err
 	}

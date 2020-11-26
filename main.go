@@ -57,7 +57,7 @@ func main() {
 		fmt.Println("Service run with default config")
 		fmt.Println("  Log file's name:", *defLogName)
 		fmt.Println("  Last line file's name:", *defLastLineName)
-		fmt.Println("  Fail file's Name:", *defFailName)
+		fmt.Println("  Fail file's name:", *defFailName)
 		fmt.Println("  Broker:", *defBroker)
 		fmt.Println("")
 		config = serviceConfig{
@@ -76,7 +76,7 @@ func main() {
 		fmt.Println("Service run with schedule config")
 		fmt.Println("  Log file's name:", *slogName)
 		fmt.Println("  Last line file's name:", *sLastLineName)
-		fmt.Println("  Fail file's Name:", *sFailName)
+		fmt.Println("  Fail file's name:", *sFailName)
 		fmt.Println("  Broker:", *sBroker)
 		fmt.Println("  Cron format:", *cronFormat)
 		fmt.Println("")
@@ -119,8 +119,9 @@ func startService(config serviceConfig) {
 	// Run with default setting and only run one time
 	if config.isDefault {
 		logHandlerService(service)
+
 		if err = service.CloseFile(); err != nil {
-			log.Fatalln("Close file failed, err: ", err)
+			log.Fatalln(err)
 		}
 		if err = service.Close(); err != nil {
 			log.Fatalln(err)
@@ -146,13 +147,13 @@ func startService(config serviceConfig) {
 		case <-exit:
 			fmt.Println("Exiting...")
 			cronService.Stop()
-			if err = service.CloseFile(); err != nil {
-				log.Fatalln("Close file failed, err: ", err)
-			}
-			if err = service.Close(); err != nil {
-				log.Fatalln("Close kafka producer failed, err: ", err)
-			}
 
+			if err = service.CloseFile(); err != nil {
+				log.Fatalln(err)
+			}
+			if err := service.Close(); err != nil {
+				log.Fatalln(err)
+			}
 			return
 		}
 	}
