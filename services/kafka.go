@@ -12,7 +12,7 @@ type (
 		Close() error
 	}
 	KafkaProducer struct {
-		prod sarama.SyncProducer
+		Prod sarama.SyncProducer
 	}
 
 	ProducerMessage interface {
@@ -20,14 +20,17 @@ type (
 	}
 )
 
-func NewProducer(brokers []string) (*KafkaProducer, error) {
+func NewProducer(brokers []string) *KafkaProducer {
 	config := sarama.NewConfig()
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Timeout.Seconds()
 	config.Producer.Return.Successes = true
 	producer, err := sarama.NewSyncProducer(brokers, config)
-	return &KafkaProducer{prod: producer}, err
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return &KafkaProducer{Prod: producer}
 }
 
 func (k *KafkaProducer) Send(topic string, msg ProducerMessage) error {
@@ -41,7 +44,7 @@ func (k *KafkaProducer) Send(topic string, msg ProducerMessage) error {
 		Partition: -1,
 		Value:     sarama.StringEncoder(jsonMsg),
 	}
-	_, _, err = k.prod.SendMessage(kafkaMsg)
+	_, _, err = k.Prod.SendMessage(kafkaMsg)
 
 	if err == nil {
 		log.Printf("Send success Topic: %s || Message: %s \n", topic, msg.Key())
@@ -50,5 +53,5 @@ func (k *KafkaProducer) Send(topic string, msg ProducerMessage) error {
 }
 
 func (k *KafkaProducer) Close() error {
-	return k.prod.Close()
+	return k.Prod.Close()
 }

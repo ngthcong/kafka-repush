@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"gopkg.in/robfig/cron.v2"
@@ -54,7 +56,7 @@ func main() {
 		if err := defaultCmd.Parse(os.Args[2:]); err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Println("Service run with default config")
+		fmt.Println("Service run with default configuration")
 		fmt.Println("  Log file's name:", *defLogName)
 		fmt.Println("  Last line file's name:", *defLastLineName)
 		fmt.Println("  Fail file's name:", *defFailName)
@@ -73,7 +75,7 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		fmt.Println("Service run with schedule config")
+		fmt.Println("Service run with schedule configuration")
 		fmt.Println("  Log file's name:", *slogName)
 		fmt.Println("  Last line file's name:", *sLastLineName)
 		fmt.Println("  Fail file's name:", *sFailName)
@@ -102,27 +104,14 @@ func startService(config serviceConfig) {
 	fmt.Println("---------------Service Running---------------")
 	fmt.Println("")
 
-	producer, err := services.NewProducer(config.broker)
-	if err != nil {
-		log.Fatal(err)
-	}
+	producer := services.NewProducer(config.broker)
 
-	fileConfig := services.FileConfig{
-		LogName:      config.logFileName,
-		LastLineName: config.lastLineFileName,
-		FailPushName: config.failPushFileName,
-	}
-
-	service := services.NewLogHandler(*producer, fileConfig)
+	service := services.NewLogHandler(producer)
 
 	// Run with default setting and only run one time
 	if config.isDefault {
-		logHandlerService(service)
-
-		if err = service.CloseFile(); err != nil {
-			log.Fatalln(err)
-		}
-		if err = service.Close(); err != nil {
+		logHandlerService(service, config)
+		if err := service.Close(); err != nil {
 			log.Fatalln(err)
 		}
 		return
@@ -130,8 +119,8 @@ func startService(config serviceConfig) {
 
 	// Run with schedule setting and run with cron config
 	cronService := cron.New()
-	_, err = cronService.AddFunc(config.cronFormat, func() {
-		logHandlerService(service)
+	_, err := cronService.AddFunc(config.cronFormat, func() {
+		logHandlerService(service, config)
 
 	})
 	if err != nil {
@@ -146,11 +135,7 @@ func startService(config serviceConfig) {
 		case <-exit:
 			fmt.Println("Exiting...")
 			cronService.Stop()
-
-			if err = service.CloseFile(); err != nil {
-				log.Fatalln(err)
-			}
-			if err := service.Close(); err != nil {
+			if err = service.Close(); err != nil {
 				log.Fatalln(err)
 			}
 			return
@@ -158,26 +143,57 @@ func startService(config serviceConfig) {
 	}
 }
 
-func logHandlerService(service *services.LogHandler) {
-	lastLine, err := service.GetLastLine()
-	if err != nil {
-		log.Println("Get last line failed, err: ", err)
+func logHandlerService(service *services.LogHandler, config serviceConfig) {
+	lastLine, err := service.GetLastLine(config.lastLineFileName)
+	if err != nil && err.Error() == "no such file or directory" {
+		log.Println("Last line file not found, new file created")
+	}
+	if err != nil && err.Error() == "last line file empty" {
+		log.Println("Last line file empty")
+	}
+	if err != nil && err.Error() == "unexpected end of JSON input" {
+		log.Fatalln("Get last line failed, err: ", err)
 	}
 
-	if err := service.GetLog(); err != nil {
+	logFile, err := service.GetLog(config.logFileName)
+	if err != nil {
 		log.Fatalln("Get log failed, err: ", err)
 	}
 
-	if err := service.GetFailFile(); err != nil {
-		log.Fatalln("Get fail log failed, err: ", err)
+	failPushFile, err := service.GetFailFile(config.failPushFileName)
+	if err != nil && err.Error() == "no such file or directory" {
+		log.Println("Fail push file not found, new file created")
 	}
 
-	newLastLine, err := service.ReadLog(lastLine)
-	if err != nil {
-		log.Fatalln("Read log Failed, err: ", err)
+	log.Println("Start reading log at line: ", lastLine)
+	scanner := bufio.NewScanner(logFile)
+	var newLastLine int64
+	for scanner.Scan() {
+		newLastLine++
+		if newLastLine > lastLine {
+			var logInfo services.LogInfo
+			if err := json.Unmarshal(scanner.Bytes(), &logInfo); err != nil {
+				log.Println(err)
+
+				if err := service.WriteFailPush(failPushFile, scanner.Text()); err != nil {
+					log.Println("Write push failed, err: ", err)
+				}
+				continue
+			}
+			if err := service.SendMessage(logInfo.Topic, logInfo); err != nil {
+				log.Println("Fail sending message to kafka server")
+				if err := service.WriteFailPush(failPushFile, scanner.Text()); err != nil {
+					log.Println("Write push failed, err: ", err)
+				}
+			}
+		}
 	}
 
-	if err = service.StoreLastLine(newLastLine); err != nil {
+	if err = service.StoreLastLine(config.lastLineFileName, newLastLine); err != nil {
 		log.Fatalln("Store last line failed, err: ", err)
 	}
+	if err = service.CloseFile(logFile, failPushFile); err != nil {
+		log.Fatalln(err)
+	}
+
 }
