@@ -65,7 +65,7 @@
       <recent name="D:\Repo\Go\kafka-repush" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestWriteFailPush in kafka-repush/services">
+  <component name="RunManager" selected="Go Test.TestCloseFile in kafka-repush/services">
     <configuration name="TestClose in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
@@ -122,9 +122,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestWriteFailPush in kafka-repush/services" />
         <item itemvalue="Go Test.TestCloseFile in kafka-repush/services" />
         <item itemvalue="Go Test.go test kafka-repush/services" />
+        <item itemvalue="Go Test.TestWriteFailPush in kafka-repush/services" />
         <item itemvalue="Go Test.TestClose in kafka-repush/services" />
         <item itemvalue="Go Test.TestStoreLastLine in kafka-repush/services" />
       </list>
@@ -181,22 +181,22 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1606384244937" />
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606463636670">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606465502084">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606463636670" />
-    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606463636670">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606465502084" />
+    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606465502084">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606463636670" />
-    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606463636670">
+    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606465502084" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606465502084">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606463636670" />
-    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606463636670">
+    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606465502084" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606465502084">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606463636670" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606465502084" />
     <state width="1877" height="352" key="GridCell.Tab.1.bottom" timestamp="1606457642380">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -213,10 +213,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="1877" height="352" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606457642380" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606462549605">
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606465128339">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606462549605" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606465128339" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

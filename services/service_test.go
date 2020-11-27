@@ -175,19 +175,22 @@ func TestCloseFile(t *testing.T) {
 	mockKafka := NewMockProducer(ctrl)
 	service := services.NewLogHandler(mockKafka)
 
-	logfile1, err := ioutil.TempFile("", "example.*.txt")
+	logfile1, err := ioutil.TempFile("", "example*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	failFile1, err := ioutil.TempFile("", "example.*.txt")
+
+	failFile1, err := ioutil.TempFile("", "example*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	logfile2, err := ioutil.TempFile("", "example.*.txt")
+
+	logfile2, err := ioutil.TempFile("", "example*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	failFile2, err := ioutil.TempFile("", "example.*.txt")
+
+	failFile2, err := ioutil.TempFile("", "example*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -244,6 +247,7 @@ func TestCloseFile(t *testing.T) {
 		err := service.CloseFile(test.input.logFile, test.input.failPushFile)
 		assert.Equal(t, test.output, err)
 	}
+
 }
 func TestWriteFailPush(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -254,10 +258,13 @@ func TestWriteFailPush(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer logfile1.Close()
+
 	logfile2, err := ioutil.TempFile("", "example.*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer logfile2.Close()
 
 	type failPush struct {
 		logFile *os.File
@@ -306,6 +313,13 @@ func TestWriteFailPush(t *testing.T) {
 	for _, test := range testCases {
 		err := service.WriteFailPush(test.input.logFile, test.input.msg)
 		assert.Equal(t, test.output, err)
+	}
+
+	if err = logfile1.Close(); err != nil {
+		log.Fatalln(err)
+	}
+	if err = logfile2.Close(); err != nil {
+		log.Fatalln(err)
 	}
 }
 func TestClose(t *testing.T) {
