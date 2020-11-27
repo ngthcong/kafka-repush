@@ -19,14 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="Implement new way of using interface">
+    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="added unit test">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/kafka.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/kafka.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +149,8 @@
     <MESSAGE value="Change code structure" />
     <MESSAGE value="Added defer on closing file" />
     <MESSAGE value="Implement new way of using interface" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement new way of using interface" />
+    <MESSAGE value="added unit test" />
+    <option name="LAST_COMMIT_MESSAGE" value="added unit test" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -215,10 +212,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="1877" height="352" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606457642380" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606387554210">
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606459183534">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606387554210" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606459183534" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -230,7 +227,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service.go</url>
-          <line>63</line>
+          <line>65</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -240,7 +237,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service.go</url>
-          <line>97</line>
+          <line>98</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>

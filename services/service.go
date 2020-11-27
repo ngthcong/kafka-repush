@@ -45,10 +45,12 @@ func (r LogInfo) Key() string {
 	return r.Message
 }
 
+//NewLogHandler create new LogHandler
 func NewLogHandler(producer Producer) *LogHandler {
 	return &LogHandler{prod: producer}
 }
 
+//GetLog get log file with given filename
 func (h *LogHandler) GetLog(fileName string) (*os.File, error) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0444)
 	//if err != nil {
@@ -60,6 +62,7 @@ func (h *LogHandler) GetLog(fileName string) (*os.File, error) {
 	return file, nil
 }
 
+//GetLastLine get last readied line if any
 func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 	lastLineFile, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
 	if _, ok := err.(*os.PathError); ok {
@@ -84,6 +87,7 @@ func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 	return lastLineJson.LastLine, nil
 }
 
+//GetFailFile get fail push file, create a new file if there no such file exist
 func (h *LogHandler) GetFailFile(fileName string) (*os.File, error) {
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if _, ok := err.(*os.PathError); ok {
@@ -92,10 +96,12 @@ func (h *LogHandler) GetFailFile(fileName string) (*os.File, error) {
 	return file, nil
 }
 
+//SendMessage send message to kafka server
 func (h *LogHandler) SendMessage(topic string, msg ProducerMessage) error {
 	return h.prod.Send(topic, msg)
 }
 
+//StoreLastLine store last readied line for next log read
 func (h *LogHandler) StoreLastLine(fileName string, lineNum int64) error {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -120,6 +126,7 @@ func (h *LogHandler) StoreLastLine(fileName string, lineNum int64) error {
 	return nil
 }
 
+//WriteFailPush write failed push message
 func (h *LogHandler) WriteFailPush(file *os.File, msg string) error {
 	if _, err := file.Write([]byte(msg + "\n")); err != nil {
 		return err
@@ -127,6 +134,7 @@ func (h *LogHandler) WriteFailPush(file *os.File, msg string) error {
 	return nil
 }
 
+// CloseFile close log file and fail push file
 func (h *LogHandler) CloseFile(logFile, failFile *os.File) error {
 	//Closing files
 	defer logFile.Close()
@@ -140,6 +148,7 @@ func (h *LogHandler) CloseFile(logFile, failFile *os.File) error {
 	return nil
 }
 
+//Close close kafka producer
 func (h *LogHandler) Close() error {
 	//Closing  kafka
 	return h.prod.Close()

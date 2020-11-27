@@ -20,6 +20,7 @@ type (
 	}
 )
 
+// NewProducer create new kafka producer with given brokers
 func NewProducer(brokers []string) *KafkaProducer {
 	config := sarama.NewConfig()
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
@@ -33,6 +34,7 @@ func NewProducer(brokers []string) *KafkaProducer {
 	return &KafkaProducer{Prod: producer}
 }
 
+//Send send message to kafka server
 func (k *KafkaProducer) Send(topic string, msg ProducerMessage) error {
 	//Sending to kafka server
 	jsonMsg, err := json.Marshal(msg.Key())
@@ -52,6 +54,7 @@ func (k *KafkaProducer) Send(topic string, msg ProducerMessage) error {
 	return err
 }
 
+//Close close kafka server
 func (k *KafkaProducer) Close() error {
 	return k.Prod.Close()
 }
