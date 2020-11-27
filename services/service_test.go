@@ -175,19 +175,19 @@ func TestCloseFile(t *testing.T) {
 	mockKafka := NewMockProducer(ctrl)
 	service := services.NewLogHandler(mockKafka)
 
-	logfile1, err := ioutil.TempFile("", "example")
+	logfile1, err := ioutil.TempFile("", "example.*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	failFile1, err := ioutil.TempFile("", "example")
+	failFile1, err := ioutil.TempFile("", "example.*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	logfile2, err := ioutil.TempFile("", "example")
+	logfile2, err := ioutil.TempFile("", "example.*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	failFile2, err := ioutil.TempFile("", "example")
+	failFile2, err := ioutil.TempFile("", "example.*.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -210,6 +210,10 @@ func TestCloseFile(t *testing.T) {
 		logFile:      nil,
 		failPushFile: failFile2,
 	}
+	input4 := inputFile{
+		logFile:      nil,
+		failPushFile: nil,
+	}
 	testCases := []struct {
 		name   string
 		input  inputFile
@@ -230,9 +234,77 @@ func TestCloseFile(t *testing.T) {
 			input:  input3,
 			output: errors.New("invalid argument"),
 		},
+		{
+			name:   "Missing both file",
+			input:  input4,
+			output: errors.New("invalid argument"),
+		},
 	}
 	for _, test := range testCases {
 		err := service.CloseFile(test.input.logFile, test.input.failPushFile)
+		assert.Equal(t, test.output, err)
+	}
+}
+func TestWriteFailPush(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockKafka := NewMockProducer(ctrl)
+	service := services.NewLogHandler(mockKafka)
+
+	logfile1, err := ioutil.TempFile("", "example.*.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	logfile2, err := ioutil.TempFile("", "example.*.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	type failPush struct {
+		logFile *os.File
+		msg     string
+	}
+
+	input1 := failPush{
+		logFile: logfile1,
+		msg:     "test string",
+	}
+
+	input2 := failPush{
+		msg: "test string",
+	}
+	input3 := failPush{
+		logFile: logfile2,
+	}
+	input4 := failPush{}
+
+	testCases := []struct {
+		name   string
+		input  failPush
+		output error
+	}{
+		{
+			name:   "Write succeed",
+			input:  input1,
+			output: nil,
+		},
+		{
+			name:   "Missing file",
+			input:  input2,
+			output: errors.New("invalid argument"),
+		},
+		{
+			name:   "Missing message",
+			input:  input3,
+			output: nil,
+		},
+		{
+			name:   "Missing both file and message",
+			input:  input4,
+			output: errors.New("invalid argument"),
+		},
+	}
+	for _, test := range testCases {
+		err := service.WriteFailPush(test.input.logFile, test.input.msg)
 		assert.Equal(t, test.output, err)
 	}
 }
