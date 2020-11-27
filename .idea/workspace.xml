@@ -19,10 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="added unit test">
+    <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="added comment">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/kafka.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/kafka.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/log.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,8 +67,8 @@
       <recent name="D:\Repo\Go\kafka-repush" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.go test kafka-repush/services">
-    <configuration name="TestGetFailFile in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestClose in kafka-repush/services">
+    <configuration name="TestClose in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
       <framework value="gotest" />
@@ -75,10 +76,10 @@
       <package value="kafka-repush/services" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestGetFailFile\E$" />
+      <pattern value="^\QTestClose\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestGetLastLine in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestCloseFile in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
       <framework value="gotest" />
@@ -86,10 +87,10 @@
       <package value="kafka-repush/services" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestGetLastLine\E$" />
+      <pattern value="^\QTestCloseFile\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestSendMessage in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestStoreLastLine in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
       <framework value="gotest" />
@@ -97,7 +98,7 @@
       <package value="kafka-repush/services" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestSendMessage\E$" />
+      <pattern value="^\QTestStoreLastLine\E$" />
       <method v="2" />
     </configuration>
     <configuration name="go test kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -122,11 +123,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestClose in kafka-repush/services" />
+        <item itemvalue="Go Test.TestCloseFile in kafka-repush/services" />
+        <item itemvalue="Go Test.TestStoreLastLine in kafka-repush/services" />
         <item itemvalue="Go Test.go test kafka-repush/services" />
         <item itemvalue="Go Test.gobench kafka-repush/services" />
-        <item itemvalue="Go Test.TestSendMessage in kafka-repush/services" />
-        <item itemvalue="Go Test.TestGetLastLine in kafka-repush/services" />
-        <item itemvalue="Go Test.TestGetFailFile in kafka-repush/services" />
       </list>
     </recent_temporary>
   </component>
@@ -150,7 +151,8 @@
     <MESSAGE value="Added defer on closing file" />
     <MESSAGE value="Implement new way of using interface" />
     <MESSAGE value="added unit test" />
-    <option name="LAST_COMMIT_MESSAGE" value="added unit test" />
+    <MESSAGE value="added comment" />
+    <option name="LAST_COMMIT_MESSAGE" value="added comment" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -180,22 +182,22 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1606384244937" />
-    <state width="914" height="338" key="GridCell.Tab.0.bottom" timestamp="1606458954255">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606462425507">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="914" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606458954255" />
-    <state width="914" height="338" key="GridCell.Tab.0.center" timestamp="1606458954255">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606462425507" />
+    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606462425507">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="914" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606458954255" />
-    <state width="914" height="338" key="GridCell.Tab.0.left" timestamp="1606458954255">
+    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606462425507" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606462425507">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="914" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606458954255" />
-    <state width="914" height="338" key="GridCell.Tab.0.right" timestamp="1606458954255">
+    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606462425507" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606462425507">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="914" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606458954255" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606462425507" />
     <state width="1877" height="352" key="GridCell.Tab.1.bottom" timestamp="1606457642380">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -212,32 +214,32 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="1877" height="352" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606457642380" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606459183534">
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606459793941">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606459183534" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606459793941" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service_test.go</url>
-          <line>30</line>
+          <line>33</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service.go</url>
-          <line>65</line>
+          <line>64</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service_test.go</url>
-          <line>87</line>
+          <line>90</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service.go</url>
-          <line>98</line>
+          <line>96</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>

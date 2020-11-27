@@ -101,7 +101,7 @@ func (h *LogHandler) SendMessage(topic string, msg ProducerMessage) error {
 	return h.prod.Send(topic, msg)
 }
 
-//StoreLastLine store last readied line for next log read
+//StoreLastLine store last readied line for next log read, created new file if there no such file
 func (h *LogHandler) StoreLastLine(fileName string, lineNum int64) error {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
