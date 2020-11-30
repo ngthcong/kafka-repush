@@ -26,7 +26,6 @@ type (
 )
 
 var (
-	//brokers = []string{"192.168.75.132:9092"}
 	config serviceConfig
 )
 
@@ -56,12 +55,14 @@ func main() {
 		if err := defaultCmd.Parse(os.Args[2:]); err != nil {
 			log.Fatalln(err)
 		}
+
 		fmt.Println("Service run with default configuration")
 		fmt.Println("  Log file's name:", *defLogName)
 		fmt.Println("  Last line file's name:", *defLastLineName)
 		fmt.Println("  Fail file's name:", *defFailName)
 		fmt.Println("  Broker:", *defBroker)
 		fmt.Println("")
+
 		config = serviceConfig{
 			isDefault:        true,
 			logFileName:      *defLogName,
@@ -82,6 +83,7 @@ func main() {
 		fmt.Println("  Broker:", *sBroker)
 		fmt.Println("  Cron format:", *cronFormat)
 		fmt.Println("")
+
 		config = serviceConfig{
 			isDefault:        false,
 			logFileName:      *slogName,
@@ -128,6 +130,7 @@ func startService(config serviceConfig) {
 	}
 
 	cronService.Start()
+
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGTERM, syscall.SIGINT, os.Interrupt, os.Kill)
 	for {
@@ -135,9 +138,11 @@ func startService(config serviceConfig) {
 		case <-exit:
 			fmt.Println("Exiting...")
 			cronService.Stop()
+
 			if err = service.Close(); err != nil {
 				log.Fatalln(err)
 			}
+
 			return
 		}
 	}
@@ -145,9 +150,11 @@ func startService(config serviceConfig) {
 
 func logHandlerService(service *services.LogHandler, config serviceConfig) {
 	lastLine, err := service.GetLastLine(config.lastLineFileName)
+
 	if err != nil && err.Error() == "no such file or directory" {
 		log.Println("Last line file not found, new file created")
 	}
+
 	if err != nil && err.Error() == "last line file empty" {
 		log.Println("Last line file empty")
 	}
@@ -161,11 +168,12 @@ func logHandlerService(service *services.LogHandler, config serviceConfig) {
 	}
 
 	failPushFile, err := service.GetFailFile(config.failPushFileName)
-	if err != nil && err.Error() == "no such file or directory" {
-		log.Println("Fail push file not found, new file created")
+	if err != nil {
+		log.Fatalln("Get fail push file failed, err: ", err)
 	}
 
 	log.Println("Start reading log at line: ", lastLine)
+
 	scanner := bufio.NewScanner(logFile)
 	var newLastLine int64
 	for scanner.Scan() {
@@ -192,7 +200,11 @@ func logHandlerService(service *services.LogHandler, config serviceConfig) {
 	if err = service.StoreLastLine(config.lastLineFileName, newLastLine); err != nil {
 		log.Fatalln("Store last line failed, err: ", err)
 	}
-	if err = service.CloseFile(logFile, failPushFile); err != nil {
+
+	if err = service.CloseFile(logFile); err != nil {
+		log.Fatalln(err)
+	}
+	if err = service.CloseFile(failPushFile); err != nil {
 		log.Fatalln(err)
 	}
 

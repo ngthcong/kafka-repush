@@ -17,11 +17,11 @@ type (
 		GetLastLine(fileName string) (int64, error)
 		GetLog(fileName string) error
 		GetFailFile(fileName string) error
-		//ReadLog(file *os.File,lastLine int64) (int64, error)
+
 		SendMessage(topic string, msg ProducerMessage) error
 		StoreLastLine(fileName string, lineNum int64) error
 		WriteFailPush(msg string) error
-		CloseFile(logFile, failFile *os.File) error
+		CloseFile(file *os.File) error
 		Close() error
 	}
 
@@ -53,16 +53,14 @@ func NewLogHandler(producer Producer) *LogHandler {
 //GetLog get log file with given filename
 func (h *LogHandler) GetLog(fileName string) (*os.File, error) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0444)
-	//if err != nil {
-	//	return nil,err
-	//}
+
 	if _, ok := err.(*os.PathError); ok {
 		return nil, errors.New("no such file or directory")
 	}
 	return file, nil
 }
 
-//GetLastLine get last readied line if any
+//GetLastLine get last read line if any
 func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 	lastLineFile, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
 	if _, ok := err.(*os.PathError); ok {
@@ -90,10 +88,7 @@ func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 //GetFailFile get fail push file, create a new file if there no such file exist
 func (h *LogHandler) GetFailFile(fileName string) (*os.File, error) {
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if _, ok := err.(*os.PathError); ok {
-		return nil, errors.New("no such file or directory")
-	}
-	return file, nil
+	return file, err
 }
 
 //SendMessage send message to kafka server
@@ -101,7 +96,7 @@ func (h *LogHandler) SendMessage(topic string, msg ProducerMessage) error {
 	return h.prod.Send(topic, msg)
 }
 
-//StoreLastLine store last readied line for next log read, created new file if there no such file
+//StoreLastLine store last read line for next log read, created new file if there no such file
 func (h *LogHandler) StoreLastLine(fileName string, lineNum int64) error {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -135,14 +130,10 @@ func (h *LogHandler) WriteFailPush(file *os.File, msg string) error {
 }
 
 // CloseFile close log file and fail push file
-func (h *LogHandler) CloseFile(logFile, failFile *os.File) error {
+func (h *LogHandler) CloseFile(file *os.File) error {
 	//Closing files
-	defer logFile.Close()
-	defer failFile.Close()
-	if err := logFile.Close(); err != nil {
-		return err
-	}
-	if err := failFile.Close(); err != nil {
+	defer file.Close()
+	if err := file.Close(); err != nil {
 		return err
 	}
 	return nil

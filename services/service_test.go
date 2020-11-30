@@ -69,22 +69,22 @@ func TestGetLastLine(t *testing.T) {
 	}{
 		{
 			name:   "Get last line succeed",
-			input:  "test\\last-line1.txt",
+			input:  "testdata\\last-line1.txt",
 			output: nil,
 		},
 		{
 			name:   "Wrong JSON format",
-			input:  "test\\last-line2.txt",
+			input:  "testdata\\last-line2.txt",
 			output: errors.New("unexpected end of JSON input"),
 		},
 		{
 			name:   "File empty",
-			input:  "test\\last-line3.txt",
+			input:  "testdata\\last-line3.txt",
 			output: nil,
 		},
 		{
 			name:   "File not exist",
-			input:  "test\\last-line4.txt",
+			input:  "testdata\\last-line4.txt",
 			output: errors.New("no such file or directory"),
 		},
 	}
@@ -100,8 +100,8 @@ func TestSendMessage(t *testing.T) {
 	service := services.NewLogHandler(mockKafka)
 
 	logInfo := &services.LogInfo{
-		Topic:   "test",
-		Message: "test",
+		Topic:   "testdata",
+		Message: "testdata",
 	}
 
 	failErr := errors.New("sending message failed")
@@ -175,76 +175,28 @@ func TestCloseFile(t *testing.T) {
 	mockKafka := NewMockProducer(ctrl)
 	service := services.NewLogHandler(mockKafka)
 
-	logfile1, err := ioutil.TempFile("", "example*.txt")
+	file, err := ioutil.TempFile("", "example*.txt")
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	failFile1, err := ioutil.TempFile("", "example*.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	logfile2, err := ioutil.TempFile("", "example*.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	failFile2, err := ioutil.TempFile("", "example*.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	type inputFile struct {
-		logFile      *os.File
-		failPushFile *os.File
-	}
-
-	input1 := inputFile{
-		logFile:      logfile1,
-		failPushFile: failFile1,
-	}
-
-	input2 := inputFile{
-		logFile:      logfile2,
-		failPushFile: nil,
-	}
-	input3 := inputFile{
-		logFile:      nil,
-		failPushFile: failFile2,
-	}
-	input4 := inputFile{
-		logFile:      nil,
-		failPushFile: nil,
 	}
 	testCases := []struct {
 		name   string
-		input  inputFile
+		input  *os.File
 		output error
 	}{
 		{
-			name:   "Close  files succeed",
-			input:  input1,
+			name:   "Close files succeed",
+			input:  file,
 			output: nil,
 		},
 		{
 			name:   "Missing file",
-			input:  input2,
-			output: errors.New("invalid argument"),
-		},
-		{
-			name:   "Missing file",
-			input:  input3,
-			output: errors.New("invalid argument"),
-		},
-		{
-			name:   "Missing both file",
-			input:  input4,
+			input:  nil,
 			output: errors.New("invalid argument"),
 		},
 	}
 	for _, test := range testCases {
-		err := service.CloseFile(test.input.logFile, test.input.failPushFile)
+		err := service.CloseFile(test.input)
 		assert.Equal(t, test.output, err)
 	}
 
@@ -273,11 +225,11 @@ func TestWriteFailPush(t *testing.T) {
 
 	input1 := failPush{
 		logFile: logfile1,
-		msg:     "test string",
+		msg:     "testdata string",
 	}
 
 	input2 := failPush{
-		msg: "test string",
+		msg: "testdata string",
 	}
 	input3 := failPush{
 		logFile: logfile2,
@@ -357,6 +309,5 @@ func TestClose(t *testing.T) {
 				t.Errorf("got err = %v, expects err = %v", err, test.output)
 			}
 		})
-
 	}
 }
