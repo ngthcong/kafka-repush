@@ -33,7 +33,7 @@ func TestGetLog(t *testing.T) {
 	}
 	for _, test := range testCases {
 		_, err := service.GetLog(test.input)
-		assert.Equal(t, err, test.output)
+		assert.Equal(t, test.output, err)
 	}
 
 }

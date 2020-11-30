@@ -20,15 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1001595b-dfdc-41de-9eee-1922911deb09" name="Default Changelist" comment="added unit test">
-      <change afterPath="$PROJECT_DIR$/services/testdata/last-line1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/kafka.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/kafka.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/service_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/test/last-line1.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/test/last-line2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/testdata/last-line2.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/test/last-line3.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/testdata/last-line3.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +69,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Go Test.go test kafka-repush/services (1)">
-    <configuration name="TestCloseFile in kafka-repush/services (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestCloseProducer in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
       <framework value="gotest" />
@@ -81,18 +77,7 @@
       <package value="kafka-repush/services" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestCloseFile\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestCloseFile in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="kafka-repush" />
-      <working_directory value="$PROJECT_DIR$/services" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="kafka-repush/services" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestCloseFile\E$" />
+      <pattern value="^\QTestCloseProducer\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestGetFailFile in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -106,7 +91,7 @@
       <pattern value="^\QTestGetFailFile\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test kafka-repush/services (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestNewProducer in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
       <framework value="gotest" />
@@ -114,9 +99,21 @@
       <package value="kafka-repush/services" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestNewProducer\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestSend in kafka-repush/services" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="kafka-repush" />
+      <working_directory value="$PROJECT_DIR$/services" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="kafka-repush/services" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestSend\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test kafka-repush/services (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="kafka-repush" />
       <working_directory value="$PROJECT_DIR$/services" />
       <framework value="gotest" />
@@ -129,10 +126,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Test.go test kafka-repush/services (1)" />
+        <item itemvalue="Go Test.TestCloseProducer in kafka-repush/services" />
+        <item itemvalue="Go Test.TestSend in kafka-repush/services" />
+        <item itemvalue="Go Test.TestNewProducer in kafka-repush/services" />
         <item itemvalue="Go Test.TestGetFailFile in kafka-repush/services" />
-        <item itemvalue="Go Test.TestCloseFile in kafka-repush/services (1)" />
-        <item itemvalue="Go Test.go test kafka-repush/services" />
-        <item itemvalue="Go Test.TestCloseFile in kafka-repush/services" />
       </list>
     </recent_temporary>
   </component>
@@ -188,22 +185,22 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1606384244937" />
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606705919682">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1606711004769">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606705919682" />
-    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606705919682">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1606711004769" />
+    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1606711004769">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606705919682" />
-    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606705919681">
+    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1606711004769" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1606711004769">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606705919681" />
-    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606705919682">
+    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1606711004769" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1606711004769">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606705919682" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606711004769" />
     <state width="1877" height="211" key="GridCell.Tab.1.bottom" timestamp="1606703609062">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -220,10 +217,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="1877" height="211" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1606703609062" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606465858597">
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1606707014774">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606465858597" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1606707014774" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -234,18 +231,13 @@
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/services/service.go</url>
-          <line>62</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service_test.go</url>
           <line>90</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/services/service.go</url>
-          <line>91</line>
+          <line>90</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -255,5 +247,8 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/kafka_repush$go_test_kafka_repush_services__1_.out" NAME="go test kafka-repush/services (1) Coverage Results" MODIFIED="1606710809120" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

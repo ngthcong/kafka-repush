@@ -21,17 +21,15 @@ type (
 )
 
 // NewProducer create new kafka producer with given brokers
-func NewProducer(brokers []string) *KafkaProducer {
+func NewProducer(brokers []string) (*KafkaProducer, error) {
 	config := sarama.NewConfig()
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Timeout.Seconds()
 	config.Producer.Return.Successes = true
 	producer, err := sarama.NewSyncProducer(brokers, config)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return &KafkaProducer{Prod: producer}
+
+	return &KafkaProducer{Prod: producer}, err
 }
 
 //Send send message to kafka server

@@ -17,7 +17,6 @@ type (
 		GetLastLine(fileName string) (int64, error)
 		GetLog(fileName string) error
 		GetFailFile(fileName string) error
-
 		SendMessage(topic string, msg ProducerMessage) error
 		StoreLastLine(fileName string, lineNum int64) error
 		WriteFailPush(msg string) error

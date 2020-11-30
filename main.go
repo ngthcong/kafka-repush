@@ -106,7 +106,7 @@ func startService(config serviceConfig) {
 	fmt.Println("---------------Service Running---------------")
 	fmt.Println("")
 
-	producer := services.NewProducer(config.broker)
+	producer, err := services.NewProducer(config.broker)
 
 	service := services.NewLogHandler(producer)
 
@@ -121,7 +121,7 @@ func startService(config serviceConfig) {
 
 	// Run with schedule setting and run with cron config
 	cronService := cron.New()
-	_, err := cronService.AddFunc(config.cronFormat, func() {
+	_, err = cronService.AddFunc(config.cronFormat, func() {
 		logHandlerService(service, config)
 
 	})
@@ -156,7 +156,7 @@ func logHandlerService(service *services.LogHandler, config serviceConfig) {
 	}
 
 	if err != nil && err.Error() == "last line file empty" {
-		log.Println("Last line file empty")
+		log.Println(err)
 	}
 	if err != nil && err.Error() == "unexpected end of JSON input" {
 		log.Fatalln("Get last line failed, err: ", err)
