@@ -41,6 +41,7 @@ func TestNewProducer(t *testing.T) {
 func TestSend(t *testing.T) {
 	broker1 := []string{"192.168.75.132:9092"}
 	producer, err := services.NewProducer(broker1)
+
 	if err != nil {
 		log.Fatalln(err)
 	}

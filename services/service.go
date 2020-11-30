@@ -76,7 +76,7 @@ func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 		}
 	}
 
-	if err = lastLineFile.Close(); err != nil {
+	if err := lastLineFile.Close(); err != nil {
 		return lastLineJson.LastLine, err
 	}
 

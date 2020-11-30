@@ -38,7 +38,7 @@ func main() {
 	defBroker := defaultCmd.String("broker", "", "Kafka broker")
 
 	scheduleCmd := flag.NewFlagSet("schedule", flag.ExitOnError)
-	slogName := scheduleCmd.String("log-name", "", "Log file name")
+	sLogName := scheduleCmd.String("log-name", "", "Log file name")
 	sLastLineName := scheduleCmd.String("last-line-name", "", "File name to store last readied line")
 	sFailName := scheduleCmd.String("fail-name", "", "File name to store failed push")
 	sBroker := scheduleCmd.String("broker", "", "Kafka broker")
@@ -77,7 +77,7 @@ func main() {
 		}
 
 		fmt.Println("Service run with schedule configuration")
-		fmt.Println("  Log file's name:", *slogName)
+		fmt.Println("  Log file's name:", *sLogName)
 		fmt.Println("  Last line file's name:", *sLastLineName)
 		fmt.Println("  Fail file's name:", *sFailName)
 		fmt.Println("  Broker:", *sBroker)
@@ -86,7 +86,7 @@ func main() {
 
 		config = serviceConfig{
 			isDefault:        false,
-			logFileName:      *slogName,
+			logFileName:      *sLogName,
 			lastLineFileName: *sLastLineName,
 			failPushFileName: *sFailName,
 			broker:           strings.Split(*sBroker, " "),
@@ -119,7 +119,7 @@ func startService(config serviceConfig) {
 		return
 	}
 
-	// Run with schedule setting and run with cron config
+	// Run with schedule setting
 	cronService := cron.New()
 	_, err = cronService.AddFunc(config.cronFormat, func() {
 		logHandlerService(service, config)
@@ -149,23 +149,20 @@ func startService(config serviceConfig) {
 }
 
 func logHandlerService(service *services.LogHandler, config serviceConfig) {
+
+	logFile, err := service.GetLog(config.logFileName)
+	if err != nil {
+		log.Fatalln("Get log failed, err: ", err)
+	}
+
 	lastLine, err := service.GetLastLine(config.lastLineFileName)
 
 	if err != nil && err == services.ErrDirNotFound {
 		log.Println("Last line file not found, new file created")
 	}
 
-	if err != nil && err.Error() == "last line file empty" {
-		log.Println(err)
-	}
-
 	if err != nil && err == services.ErrJsonInput {
 		log.Fatalln("Get last line failed, err: ", err)
-	}
-
-	logFile, err := service.GetLog(config.logFileName)
-	if err != nil {
-		log.Fatalln("Get log failed, err: ", err)
 	}
 
 	failPushFile, err := service.GetFailFile(config.failPushFileName)
@@ -190,9 +187,9 @@ func logHandlerService(service *services.LogHandler, config serviceConfig) {
 				continue
 			}
 			if err := service.SendMessage(logInfo.Topic, logInfo); err != nil {
-				log.Println("Fail sending message to kafka server")
+				log.Println("Send message to kafka server failed")
 				if err := service.WriteFailPush(failPushFile, scanner.Text()); err != nil {
-					log.Println("Write push failed, err: ", err)
+					log.Println("Write fail push failed, err: ", err)
 				}
 			}
 		}

@@ -22,7 +22,7 @@ func TestGetLog(t *testing.T) {
 	}{
 		{
 			name:   "Read file succeed",
-			input:  "log.txt",
+			input:  "testdata\\log.txt",
 			output: nil,
 		},
 		{
@@ -35,7 +35,6 @@ func TestGetLog(t *testing.T) {
 		_, err := service.GetLog(test.input)
 		assert.Equal(t, test.output, err)
 	}
-
 }
 
 func TestGetFailFile(t *testing.T) {
@@ -137,7 +136,6 @@ func TestSendMessage(t *testing.T) {
 				t.Errorf("got err = %v, expects err = %v", err, test.output)
 			}
 		})
-
 	}
 }
 
