@@ -151,14 +151,15 @@ func startService(config serviceConfig) {
 func logHandlerService(service *services.LogHandler, config serviceConfig) {
 	lastLine, err := service.GetLastLine(config.lastLineFileName)
 
-	if err != nil && err.Error() == "no such file or directory" {
+	if err != nil && err == services.ErrDirNotFound {
 		log.Println("Last line file not found, new file created")
 	}
 
 	if err != nil && err.Error() == "last line file empty" {
 		log.Println(err)
 	}
-	if err != nil && err.Error() == "unexpected end of JSON input" {
+
+	if err != nil && err == services.ErrJsonInput {
 		log.Fatalln("Get last line failed, err: ", err)
 	}
 

@@ -28,7 +28,7 @@ func TestGetLog(t *testing.T) {
 		{
 			name:   "Read file fail, file does not exist",
 			input:  "log",
-			output: errors.New("no such file or directory"),
+			output: services.ErrDirNotFound,
 		},
 	}
 	for _, test := range testCases {
@@ -75,7 +75,7 @@ func TestGetLastLine(t *testing.T) {
 		{
 			name:   "Wrong JSON format",
 			input:  "testdata\\last-line2.txt",
-			output: errors.New("unexpected end of JSON input"),
+			output: services.ErrJsonInput,
 		},
 		{
 			name:   "File empty",
@@ -85,7 +85,7 @@ func TestGetLastLine(t *testing.T) {
 		{
 			name:   "File not exist",
 			input:  "testdata\\last-line4.txt",
-			output: errors.New("no such file or directory"),
+			output: services.ErrDirNotFound,
 		},
 	}
 	for _, test := range testCases {
@@ -192,7 +192,7 @@ func TestCloseFile(t *testing.T) {
 		{
 			name:   "Missing file",
 			input:  nil,
-			output: errors.New("invalid argument"),
+			output: services.ErrInArg,
 		},
 	}
 	for _, test := range testCases {
@@ -249,7 +249,7 @@ func TestWriteFailPush(t *testing.T) {
 		{
 			name:   "Missing file",
 			input:  input2,
-			output: errors.New("invalid argument"),
+			output: services.ErrInArg,
 		},
 		{
 			name:   "Missing message",
@@ -259,7 +259,7 @@ func TestWriteFailPush(t *testing.T) {
 		{
 			name:   "Missing both file and message",
 			input:  input4,
-			output: errors.New("invalid argument"),
+			output: services.ErrInArg,
 		},
 	}
 	for _, test := range testCases {

@@ -3,7 +3,6 @@ package services
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"os"
 )
 
@@ -54,7 +53,7 @@ func (h *LogHandler) GetLog(fileName string) (*os.File, error) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0444)
 
 	if _, ok := err.(*os.PathError); ok {
-		return nil, errors.New("no such file or directory")
+		return nil, ErrDirNotFound
 	}
 	return file, nil
 }
@@ -63,7 +62,7 @@ func (h *LogHandler) GetLog(fileName string) (*os.File, error) {
 func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 	lastLineFile, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
 	if _, ok := err.(*os.PathError); ok {
-		return 0, errors.New("no such file or directory")
+		return 0, ErrDirNotFound
 	}
 
 	lastLineScanner := bufio.NewScanner(lastLineFile)
@@ -73,7 +72,7 @@ func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
 	for lastLineScanner.Scan() {
 		err = json.Unmarshal(lastLineScanner.Bytes(), &lastLineJson)
 		if err != nil {
-			return 0, errors.New("unexpected end of JSON input")
+			return 0, ErrJsonInput
 		}
 	}
 
