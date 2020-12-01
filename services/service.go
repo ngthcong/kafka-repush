@@ -1,8 +1,8 @@
 package services
 
 import (
-	"bufio"
 	"encoding/json"
+	"io/ioutil"
 	"os"
 )
 
@@ -13,13 +13,10 @@ type (
 	}
 
 	LogService interface {
-		GetLastLine(fileName string) (int64, error)
-		GetLog(fileName string) error
-		GetFailFile(fileName string) error
+		GetConfig(fileName string) (Config, error)
 		SendMessage(topic string, msg ProducerMessage) error
-		StoreLastLine(fileName string, lineNum int64) error
+		StoreConfig(file *os.File, config Config) error
 		WriteFailPush(msg string) error
-		CloseFile(file *os.File) error
 		Close() error
 	}
 
@@ -27,13 +24,7 @@ type (
 		prod Producer
 	}
 
-	FileConfig struct {
-		LogName      string
-		LastLineName string
-		FailPushName string
-	}
-
-	LastLineInfo struct {
+	Config struct {
 		LastLine int64 `json:"lastLine"`
 	}
 )
@@ -48,45 +39,19 @@ func NewLogHandler(producer Producer) *LogHandler {
 	return &LogHandler{prod: producer}
 }
 
-//GetLog get log file with given filename
-func (h *LogHandler) GetLog(fileName string) (*os.File, error) {
-	file, err := os.OpenFile(fileName, os.O_RDONLY, 0444)
-
-	if _, ok := err.(*os.PathError); ok {
-		return nil, ErrDirNotFound
-	}
-	return file, nil
-}
-
 //GetLastLine get last read line if any
-func (h *LogHandler) GetLastLine(fileName string) (int64, error) {
-	lastLineFile, err := os.OpenFile(fileName, os.O_RDONLY, 0644)
-	if _, ok := err.(*os.PathError); ok {
-		return 0, ErrDirNotFound
+func (h *LogHandler) GetConfig(file *os.File) (Config, error) {
+
+	configByte, err := ioutil.ReadAll(file)
+	if err != nil {
+		return Config{}, err
 	}
-
-	lastLineScanner := bufio.NewScanner(lastLineFile)
-
-	lastLineJson := LastLineInfo{}
-
-	for lastLineScanner.Scan() {
-		err = json.Unmarshal(lastLineScanner.Bytes(), &lastLineJson)
-		if err != nil {
-			return 0, ErrJsonInput
-		}
+	config := Config{}
+	err = json.Unmarshal(configByte, &config)
+	if err != nil {
+		return Config{}, ErrJsonInput
 	}
-
-	if err := lastLineFile.Close(); err != nil {
-		return lastLineJson.LastLine, err
-	}
-
-	return lastLineJson.LastLine, nil
-}
-
-//GetFailFile get fail push file, create a new file if there no such file exist
-func (h *LogHandler) GetFailFile(fileName string) (*os.File, error) {
-	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	return file, err
+	return config, nil
 }
 
 //SendMessage send message to kafka server
@@ -95,43 +60,26 @@ func (h *LogHandler) SendMessage(topic string, msg ProducerMessage) error {
 }
 
 //StoreLastLine store last read line for next log read, created new file if there no such file
-func (h *LogHandler) StoreLastLine(fileName string, lineNum int64) error {
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
+func (h *LogHandler) StoreConfig(file *os.File, config Config) error {
+	configByte, err := json.Marshal(config)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-
-	lastLine, err := json.Marshal(LastLineInfo{LastLine: lineNum})
-	if err != nil {
+	if err := file.Truncate(0); err != nil {
 		return err
 	}
-	if err = file.Truncate(0); err != nil {
+	if _, err := file.Seek(0, 0); err != nil {
 		return err
 	}
-	if _, err = file.Write(lastLine); err != nil {
+	if _, err = file.Write(configByte); err != nil {
 		return err
 	}
-	if err = file.Close(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 //WriteFailPush write failed push message
 func (h *LogHandler) WriteFailPush(file *os.File, msg string) error {
 	if _, err := file.Write([]byte(msg + "\n")); err != nil {
-		return err
-	}
-	return nil
-}
-
-// CloseFile close log file and fail push file
-func (h *LogHandler) CloseFile(file *os.File) error {
-	//Closing files
-	defer file.Close()
-	if err := file.Close(); err != nil {
 		return err
 	}
 	return nil

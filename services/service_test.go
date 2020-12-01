@@ -11,84 +11,40 @@ import (
 	"testing"
 )
 
-func TestGetLog(t *testing.T) {
+func TestGetConfig(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockKafka := NewMockProducer(ctrl)
 	service := services.NewLogHandler(mockKafka)
-	testCases := []struct {
-		name   string
-		input  string
-		output error
-	}{
-		{
-			name:   "Read file succeed",
-			input:  "testdata\\log.txt",
-			output: nil,
-		},
-		{
-			name:   "Read file fail, file does not exist",
-			input:  "log",
-			output: services.ErrDirNotFound,
-		},
-	}
-	for _, test := range testCases {
-		_, err := service.GetLog(test.input)
-		assert.Equal(t, test.output, err)
-	}
-}
 
-func TestGetFailFile(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	mockKafka := NewMockProducer(ctrl)
-	service := services.NewLogHandler(mockKafka)
+	//Get config with given config flag
+	configFile1, err := os.OpenFile("testdata\\conf.json", os.O_RDWR, 6440)
+	if err != nil {
+		log.Fatalln("Get config failed, err: ", err)
+	}
+	//Get config with given config flag
+	configFile2, err := os.OpenFile("testdata\\conf2.json", os.O_RDWR, 6440)
+	if err != nil {
+		log.Fatalln("Get config failed, err: ", err)
+	}
+
 	testCases := []struct {
 		name   string
-		input  string
-		output error
-	}{
-		{
-			name:   "Read file succeed",
-			input:  "fail-push.txt",
-			output: nil,
-		},
-	}
-	for _, test := range testCases {
-		_, err := service.GetFailFile(test.input)
-		assert.Equal(t, test.output, err)
-	}
-}
-func TestGetLastLine(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	mockKafka := NewMockProducer(ctrl)
-	service := services.NewLogHandler(mockKafka)
-	testCases := []struct {
-		name   string
-		input  string
+		input  *os.File
 		output error
 	}{
 		{
 			name:   "Get last line succeed",
-			input:  "testdata\\last-line1.txt",
+			input:  configFile1,
 			output: nil,
 		},
 		{
 			name:   "Wrong JSON format",
-			input:  "testdata\\last-line2.txt",
+			input:  configFile2,
 			output: services.ErrJsonInput,
-		},
-		{
-			name:   "File empty",
-			input:  "testdata\\last-line3.txt",
-			output: nil,
-		},
-		{
-			name:   "File not exist",
-			input:  "testdata\\last-line4.txt",
-			output: services.ErrDirNotFound,
 		},
 	}
 	for _, test := range testCases {
-		_, err := service.GetLastLine(test.input)
+		_, err := service.GetConfig(test.input)
 		assert.Equal(t, test.output, err)
 	}
 }
@@ -139,21 +95,26 @@ func TestSendMessage(t *testing.T) {
 	}
 }
 
-func TestStoreLastLine(t *testing.T) {
+func TestStoreConfig(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockKafka := NewMockProducer(ctrl)
 	service := services.NewLogHandler(mockKafka)
-	type lastLineInPut struct {
-		fileName string
-		lastLine int64
+	configFile1, err := os.OpenFile("testdata\\conf.json", os.O_RDWR, 6440)
+	if err != nil {
+		log.Fatalln("Get config failed, err: ", err)
 	}
-	input := lastLineInPut{
-		fileName: "last-line.txt",
-		lastLine: 10,
+	mockConfig := services.Config{LastLine: 0}
+	type configInput struct {
+		file   *os.File
+		config services.Config
+	}
+	input := configInput{
+		file:   configFile1,
+		config: mockConfig,
 	}
 	testCases := []struct {
 		name   string
-		input  lastLineInPut
+		input  configInput
 		output error
 	}{
 		{
@@ -164,41 +125,11 @@ func TestStoreLastLine(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		err := service.StoreLastLine(test.input.fileName, test.input.lastLine)
+		err := service.StoreConfig(test.input.file, test.input.config)
 		assert.Equal(t, test.output, err)
 	}
 }
-func TestCloseFile(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	mockKafka := NewMockProducer(ctrl)
-	service := services.NewLogHandler(mockKafka)
 
-	file, err := ioutil.TempFile("", "example*.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	testCases := []struct {
-		name   string
-		input  *os.File
-		output error
-	}{
-		{
-			name:   "Close files succeed",
-			input:  file,
-			output: nil,
-		},
-		{
-			name:   "Missing file",
-			input:  nil,
-			output: services.ErrInArg,
-		},
-	}
-	for _, test := range testCases {
-		err := service.CloseFile(test.input)
-		assert.Equal(t, test.output, err)
-	}
-
-}
 func TestWriteFailPush(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockKafka := NewMockProducer(ctrl)

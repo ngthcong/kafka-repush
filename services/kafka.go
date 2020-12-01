@@ -2,8 +2,9 @@ package services
 
 import (
 	"encoding/json"
-	"github.com/Shopify/sarama"
 	"log"
+
+	"github.com/Shopify/sarama"
 )
 
 type (
